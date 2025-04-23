@@ -7,7 +7,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//kegiatan
+// Kegiatan
 Route::resource('/kegiatan', KegiatanController::class);
 
 // Pencapaian
