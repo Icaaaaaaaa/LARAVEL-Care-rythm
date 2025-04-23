@@ -10,16 +10,17 @@
         <!-- navbar -->
         <nav class="navbar navbar-expand-lg navbar-light d-none d-lg-block py-0">
             <ul class="navbar-nav d-flex gap-3 px-0 my-0">
-                <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Halaman Utama</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url('/home') }}">Halaman Utama</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Jadwal</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url('/kegiatann') }}">Kegiatan</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url('/kegiatan') }}">Kegiatan</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url('/pencapaian') }}">Pencapaian</a></li>
             </ul>
         </nav>
         <!-- profil -->
         <div class="profil d-flex align-self-center py-3">
             <div class="nama-profil d-none d-md-block pe-3">
-                <h3>Contoh Nama</h3>deskripsi
+                <h3>{{ session('user.name') }}</h3>
+                <small class="text-muted">Pengguna</small>
             </div>
             <div class="dropdown-center">
                 <a data-bs-toggle="dropdown">
@@ -30,6 +31,13 @@
                 <ul class="dropdown-menu custom-position">
                     <li><a class="dropdown-item" href="{{ url('/profil') }}">Profil</a></li>
                     <li><a class="dropdown-item" href="{{ url('/pencapaian') }}">Pencapaian</a></li>
+                    <li></li>
+                    <li>
+                        <form action="/logout" method="POST" class="px-3">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">Logout</button>
+                        </form>
+                    </li>
                     <li class="d-block d-md-none"><a class="dropdown-item" href="#">Teman</a></li>
                     <li class="d-block d-lg-none"><a class="dropdown-item" href="#">Jadwal</a></li>
                     <li class="d-block d-lg-none"><a class="dropdown-item" href="#">Kegiatan</a></li>

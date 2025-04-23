@@ -3,9 +3,14 @@
 use App\Http\Controllers\KegiatanController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/home', function () {return view('welcome');});
+
+// login
+use App\Http\Controllers\LoginController;
+
+Route::get('/', [LoginController::class, 'landing'])->name('landing');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout']);
 
 //kegiatan
 Route::resource('/kegiatan', KegiatanController::class);
