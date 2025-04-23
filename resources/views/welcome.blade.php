@@ -4,11 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<<<<<<< HEAD
-        <title>ebenhitam</title>
-=======
         <title>Care Rythm</title>
->>>>>>> a520490ad4caecbe3ac7aaa7e6b19b3b0d8f3765
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

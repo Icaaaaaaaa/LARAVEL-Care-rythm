@@ -12,7 +12,7 @@
             <ul class="navbar-nav d-flex gap-3 px-0 my-0">
                 <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Halaman Utama</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Jadwal</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Kegiatan</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url('/kegiatan') }}">Kegiatan</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url('/pencapaian') }}">Pencapaian</a></li>
             </ul>
         </nav>
