@@ -11,7 +11,7 @@ class LoginController extends Controller
     ];
 
     public function landing() {
-        return view('auth.login');
+        return view('landing.login');
     }
 
     public function login(Request $request)
