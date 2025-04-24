@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +12,7 @@
         body {
             background-color: #f5f5f5;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, rgb(255, 255, 255), rgba(138, 43, 226, 0.5));
         }
         .header {
             background-color: #7a3cff;
@@ -88,10 +92,6 @@
     </style>
 </head>
 <body>
-    <div class="header text-center">
-        <h1>Jadwal</h1>
-    </div>
-
     <div class="jadwal-container">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
@@ -167,7 +167,6 @@
         @endforelse
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Filter hari
         document.querySelector('select[name="hari"]').addEventListener('change', function() {
@@ -181,5 +180,7 @@
             document.querySelector('select[name="hari"]').value = selectedHari;
         }
     </script>
+@endsection
+
 </body>
 </html>

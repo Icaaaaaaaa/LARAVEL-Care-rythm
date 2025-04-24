@@ -8,6 +8,7 @@ class LoginController extends Controller
 {
     private $users = [
         ['email' => 'mufnah.ridz@gmail.com', 'password' => '123456', 'name' => 'Hafidz'],
+        ['email' => 'disa123@gmail.com', 'password' => '123456', 'name' => 'Disa'],
     ];
 
     public function landing() {

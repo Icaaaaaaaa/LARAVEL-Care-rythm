@@ -11,7 +11,7 @@
         <nav class="navbar navbar-expand-lg navbar-light d-none d-lg-block py-0">
             <ul class="navbar-nav d-flex gap-3 px-0 my-0">
                 <li class="nav-item"><a class="nav-link" href="{{ url('/home') }}">Halaman Utama</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Jadwal</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url('/jadwal') }}">Jadwal</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url('/kegiatan') }}">Kegiatan</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url('/pencapaian') }}">Pencapaian</a></li>
             </ul>
