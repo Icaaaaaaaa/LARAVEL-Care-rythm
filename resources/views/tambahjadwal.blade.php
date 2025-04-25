@@ -44,34 +44,40 @@
     <div class="container">
         <div class="form-container">
             <h2 class="form-title">Tambah Jadwal Baru</h2>
-            
+
+            @if (session('error'))
+                <div class="alert alert-danger text-center">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <form action="{{ route('jadwal.store') }}" method="POST">
                 @csrf
                 
                 <div class="mb-3">
                     <label for="nama" class="form-label">Nama Kegiatan</label>
-                    <input type="text" class="form-control" id="nama" name="nama" required placeholder="Contoh: Kelas Bahasa Inggris">
+                    <input type="text" class="form-control" id="nama" name="nama" required placeholder="Contoh: Kelas Bahasa Inggris" value="{{ old('nama') }}">
                 </div>
                 
                 <div class="mb-3">
                     <label for="kategori" class="form-label">Kategori</label>
                     <select class="form-select" id="kategori" name="kategori" required>
                         <option value="">Pilih Kategori</option>
-                        <option value="Pelajaran">Pelajaran</option>
-                        <option value="Olahraga">Olahraga</option>
-                        <option value="Hiburan">Hiburan</option>
-                        <option value="Lainnya">Lainnya</option>
+                        <option value="Pelajaran" {{ old('kategori') == 'Pelajaran' ? 'selected' : '' }}>Pelajaran</option>
+                        <option value="Olahraga" {{ old('kategori') == 'Olahraga' ? 'selected' : '' }}>Olahraga</option>
+                        <option value="Hiburan" {{ old('kategori') == 'Hiburan' ? 'selected' : '' }}>Hiburan</option>
+                        <option value="Lainnya" {{ old('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                     </select>
                 </div>
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="waktu_mulai" class="form-label">Waktu Mulai</label>
-                        <input type="time" class="form-control" id="waktu_mulai" name="waktu_mulai" required>
+                        <input type="time" class="form-control" id="waktu_mulai" name="waktu_mulai" required value="{{ old('waktu_mulai') }}">
                     </div>
                     <div class="col-md-6">
                         <label for="waktu_selesai" class="form-label">Waktu Selesai</label>
-                        <input type="time" class="form-control" id="waktu_selesai" name="waktu_selesai" required>
+                        <input type="time" class="form-control" id="waktu_selesai" name="waktu_selesai" required value="{{ old('waktu_selesai') }}">
                     </div>
                 </div>
                 
@@ -80,7 +86,7 @@
                     <div class="d-flex flex-wrap gap-2">
                         @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'] as $hari)
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="hari[]" value="{{ $hari }}" id="hari_{{ $loop->index }}">
+                                <input class="form-check-input" type="checkbox" name="hari[]" value="{{ $hari }}" id="hari_{{ $loop->index }}" {{ is_array(old('hari')) && in_array($hari, old('hari')) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="hari_{{ $loop->index }}">{{ $hari }}</label>
                             </div>
                         @endforeach
@@ -89,7 +95,7 @@
                 
                 <div class="mb-3">
                     <label for="catatan" class="form-label">Catatan (Opsional)</label>
-                    <textarea class="form-control" id="catatan" name="catatan" rows="2" placeholder="Tambahkan catatan jika perlu"></textarea>
+                    <textarea class="form-control" id="catatan" name="catatan" rows="2" placeholder="Tambahkan catatan jika perlu">{{ old('catatan') }}</textarea>
                 </div>
                 
                 <div class="d-flex justify-content-between mt-4">

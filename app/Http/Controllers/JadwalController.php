@@ -36,6 +36,27 @@ class JadwalController extends Controller
         ]);
 
         $jadwals = session()->get('jadwals', []);
+        $hariBaru = $request->hari;
+        $mulaiBaru = $request->waktu_mulai;
+        $selesaiBaru = $request->waktu_selesai;
+
+        foreach ($jadwals as $jadwal) {
+            $hariLama = explode(', ', $jadwal['hari']);
+            $waktu = explode(' - ', $jadwal['waktu']);
+            $mulaiLama = $waktu[0];
+            $selesaiLama = $waktu[1];
+
+            foreach ($hariBaru as $hari) {
+                if (in_array($hari, $hariLama)) {
+                    if (
+                        ($mulaiBaru < $selesaiLama) &&
+                        ($selesaiBaru > $mulaiLama)
+                    ) {
+                        return back()->withInput()->with('error', 'Jadwal tabrakan dengan jadwal yang sudah ada.');
+                    }
+                }
+            }
+        }
 
         $newJadwal = [
             'nama' => $request->nama,
@@ -74,6 +95,30 @@ class JadwalController extends Controller
         ]);
 
         $jadwals = session()->get('jadwals', []);
+        $hariBaru = $request->hari;
+        $mulaiBaru = $request->waktu_mulai;
+        $selesaiBaru = $request->waktu_selesai;
+
+        foreach ($jadwals as $key => $jadwal) {
+            if ($key == $id) continue;
+
+            $hariLama = explode(', ', $jadwal['hari']);
+            $waktu = explode(' - ', $jadwal['waktu']);
+            $mulaiLama = $waktu[0];
+            $selesaiLama = $waktu[1];
+
+            foreach ($hariBaru as $hari) {
+                if (in_array($hari, $hariLama)) {
+                    if (
+                        ($mulaiBaru < $selesaiLama) &&
+                        ($selesaiBaru > $mulaiLama)
+                    ) {
+                        return back()->withInput()->with('error', 'Jadwal tabrakan dengan jadwal yang sudah ada.');
+                    }
+                }
+            }
+        }
+
         $jadwals[$id] = [
             'nama' => $request->nama,
             'catatan' => $request->catatan,
