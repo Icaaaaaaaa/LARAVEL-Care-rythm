@@ -51,6 +51,19 @@
     </style>
 
     <a class="add-link" href="{{ route('kegiatan.create') }}">+ Tambah Kegiatan</a>
+    <form method="GET" action="{{ route('kegiatan.index') }}" style="margin-bottom: 20px;">
+    <label for="filter_hari">Filter Hari:</label>
+    <select name="hari" id="filter_hari" onchange="this.form.submit()">
+        <option value="">-- Semua Hari --</option>
+        @php
+            $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+        @endphp
+        @foreach ($hariList as $hari)
+            <option value="{{ $hari }}" {{ request('hari') == $hari ? 'selected' : '' }}>{{ $hari }}</option>
+        @endforeach
+    </select>
+    </form>
+
     <div class="row">
         
         @foreach ($kegiatan as $item)
