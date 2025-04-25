@@ -43,24 +43,31 @@
         }
 
         .row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
     </style>
-<a class="add-link" href="{{ route('kegiatan.create') }}">+ Tambah Kegiatan</a>
+
+    <a class="add-link" href="{{ route('kegiatan.create') }}">+ Tambah Kegiatan</a>
     <div class="row">
         
         @foreach ($kegiatan as $item)
             <div class="card">
-                <h3>{{ $item->nama_kegiatan }}</h3>
-                <p>{{ $item->deskripsi }}</p>
-                <p>Hari: {{ is_array($item->hari) ? implode(', ', $item->hari) : $item->hari }}</p>
-                <p>Waktu: {{ $item->waktu }}</p>
-                <p>Kategori: {{ $item->kategori }}</p>
-                <a href="{{ route('kegiatan.edit', $item->id) }}">Edit</a>
-                <form action="{{ route('kegiatan.destroy', $item->id) }}" method="POST" style="display:inline;">
+                <h3>{{ $item['nama_kegiatan'] }}</h3>
+                <p>{{ $item['deskripsi'] }}</p>
+                <p>Hari: 
+                    @if(is_array($item['hari']))
+                        {{ implode(', ', $item['hari']) }}
+                    @else
+                        {{ $item['hari'] }}
+                    @endif
+                </p>
+                <p>Waktu: {{ $item['waktu'] }}</p>
+                <p>Kategori: {{ $item['kategori'] }}</p>
+                <a href="{{ route('kegiatan.edit', $loop->index) }}">Edit</a>
+                <form action="{{ route('kegiatan.destroy', $loop->index) }}" method="POST" style="display:inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" onclick="return confirm('Yakin ingin menghapus kegiatan ini?')">Hapus</button>

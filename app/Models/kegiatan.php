@@ -16,4 +16,3 @@ class Kegiatan extends Model
         'hari' => 'array',
     ];
 }
- 
