@@ -66,7 +66,7 @@
                 </ul>
             </div>
         </div>
-        <hr>
+        <hr>    
         <h4>Tambah Kegiatan Baru</h4>
         <form action="/pencapaian/tambah-kegiatan" method="POST" class="mb-4">
             @csrf
@@ -84,3 +84,4 @@
         </form>
     </div>
 @endsection
+                    
