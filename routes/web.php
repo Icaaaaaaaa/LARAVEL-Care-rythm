@@ -25,6 +25,9 @@ Route::post('/pencapaian/kurang', [PencapaianController::class, 'kurang']);
 Route::post('/pencapaian/reset', [PencapaianController::class, 'reset']);
 Route::post('/pencapaian/tambah-kegiatan', [PencapaianController::class, 'tambahKegiatan']);
 Route::post('/pencapaian/hapus', [PencapaianController::class, 'hapus']);
+Route::get('/pencapaian/tambah-counter/{index}', [PencapaianController::class, 'formTambahCounter']);
+Route::post('/pencapaian/tambah-counter/{index}', [PencapaianController::class, 'simpanTambahCounter']);
+
 
 // Jadwal
 Route::prefix('jadwal')->group(function () {
