@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Kegiatan extends Model
 {
     protected $table = 'kegiatan';
-
+    public $timestamps = false;
     protected $fillable = [
-        'nama_kegiatan', 'deskripsi', 'hari', 'waktu', 'kategori',
-    ];
-
-    protected $casts = [
-        'hari' => 'array',
+        'kegiatan',
+        'catatan',
+        'tanggal',
+        'waktu_mulai',
+        'waktu_selesai',
+        'tempat'
     ];
 }

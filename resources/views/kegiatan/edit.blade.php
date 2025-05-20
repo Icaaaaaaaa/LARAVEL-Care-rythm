@@ -1,110 +1,63 @@
-@extends('layouts.app') {{-- Ganti dengan layout yang sesuai --}}
+@extends('layouts.app')
 
 @section('content')
 <style>
-body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            color: #000;
-            background: linear-gradient(to bottom, rgb(255, 255, 255), rgba(138, 43, 226,0.5));
-            background-size: cover;
-            background-position: top;
-            height: 100%; /* Tinggi elemen sesuai dengan tinggi viewport */
-            width: 100%;
-            height: 100vh;
-          
-            justify-content: center;
-            align-items: center;
-        }
+    body { font-family: system-ui; background: linear-gradient(to bottom, white, rgba(138,43,226,0.5)); height: 100vh; }
+    .card { background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+</style>
 
-        .card {
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-          
-        }
+<div class="card">
+    <h1 class="text-center">Edit Kegiatan</h1>
 
-        .card h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-    </style>
-    <div class="card">
-        <h1 class="text-center">Edit Kegiatan</h1>
-
-        <form action="{{ route('kegiatan.update', $kegiatan->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-
-            <!-- Nama Kegiatan -->
-            <div class="form-group">
-                <label for="namaKegiatan">Nama Kegiatan</label>
-                <input
-                    type="text"
-                    id="namaKegiatan"
-                    name="nama_kegiatan"
-                    value="{{ old('nama_kegiatan', $kegiatan->nama_kegiatan) }}"
-                    required
-                    class="form-control"
-                />
-            </div>
-
-            <!-- Deskripsi -->
-            <div class="form-group">
-                <label for="deskripsiKegiatan">Deskripsi</label>
-                <textarea
-                    id="deskripsiKegiatan"
-                    name="deskripsi"
-                    rows="3"
-                    class="form-control"
-                    required
-                >{{ old('deskripsi', $kegiatan->deskripsi) }}</textarea>
-            </div>
-
-            <!-- Hari -->
-            <div class="form-group">
-                <label for="hari">Hari</label><br>
-                @php
-                    $days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-                    $selectedDays = $kegiatan->hari ?? [];
-                @endphp
-                @foreach($days as $day)
-                    <label>
-                        <input type="checkbox" name="hari[]" value="{{ $day }}"
-                            {{ in_array($day, $selectedDays) ? 'checked' : '' }}>
-                        {{ $day }}
-                    </label><br>
+    {{-- Tampilkan error validasi --}}
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
                 @endforeach
-            </div>
+            </ul>
+        </div>
+    @endif
 
-            <!-- Waktu -->
-            <div class="form-group">
-                <label for="waktu">Waktu</label>
-                <input
-                    type="time"
-                    id="waktu"
-                    name="waktu"
-                    value="{{ old('waktu', $kegiatan->waktu) }}"
-                    required
-                    class="form-control"
-                />
-            </div>
+    <form action="{{ route('kegiatan.update', $kegiatan->id) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-            <!-- Kategori -->
-            <div class="form-group">
-                <label for="kategori">Kategori</label>
-                <select id="kategori" name="kategori" required class="form-control">
-                    <option value="Membaca" {{ $kegiatan->kategori == 'Membaca' ? 'selected' : '' }}>Membaca</option>
-                    <option value="Olahraga" {{ $kegiatan->kategori == 'Olahraga' ? 'selected' : '' }}>Olahraga</option>
-                    <option value="Belajar" {{ $kegiatan->kategori == 'Belajar' ? 'selected' : '' }}>Belajar</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label>Nama Kegiatan</label>
+            <input type="text" name="kegiatan" value="{{ old('kegiatan', $kegiatan->kegiatan) }}" class="form-control" required>
+        </div>
 
-            <!-- Tombol Submit -->
-            <div class="action">
-                <button type="submit" class="btn btn-primary">Update Kegiatan</button>
-                <a href="{{ route('kegiatan.index') }}" class="btn btn-secondary">Batal</a>
-            </div>
-        </form>
-    </div>
+        <div class="form-group">
+            <label>Catatan</label>
+            <textarea name="catatan" rows="3" class="form-control">{{ old('catatan', $kegiatan->catatan) }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Tanggal</label>
+            <input type="date" name="tanggal" value="{{ old('tanggal', $kegiatan->tanggal) }}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Waktu Mulai</label>
+            <input type="time" name="waktu_mulai" value="{{ old('waktu_mulai', $kegiatan->waktu_mulai) }}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Waktu Selesai</label>
+            <input type="time" name="waktu_selesai" value="{{ old('waktu_selesai', $kegiatan->waktu_selesai) }}" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label>Tempat</label>
+            <input type="text" name="tempat" value="{{ old('tempat', $kegiatan->tempat) }}" class="form-control">
+        </div>
+
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="{{ route('kegiatan.index') }}" class="btn btn-secondary">Batal</a>
+        </div>
+    </form>
+</div>
 @endsection
