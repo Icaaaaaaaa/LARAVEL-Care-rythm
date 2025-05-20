@@ -140,15 +140,26 @@
             </div>
         </div>
 
-        @forelse($jadwals as $index => $jadwal)
+        @forelse($jadwals as $jadwal)
             <div class="jadwal-item">
                 <span class="hari-label">{{ $jadwal['hari'] }}</span>
-                <h4>{{ $jadwal['nama'] }}</h4>
-                <div class="waktu">{{ $jadwal['waktu'] }}</div>
+                <h4>{{ $jadwal['nama_jadwal'] }}</h4>
+                <div class="waktu">
+                    {{ $jadwal['waktu_mulai'] ?? $jadwal['jam'] }} 
+                    @if(!empty($jadwal['waktu_selesai']))
+                        - {{ $jadwal['waktu_selesai'] }}
+                    @endif
+                </div>
+                @if(!empty($jadwal['kategori']))
+                    <div><strong>Kategori:</strong> {{ $jadwal['kategori'] }}</div>
+                @endif
+                @if(!empty($jadwal['catatan']))
+                    <div><strong>Catatan:</strong> {{ $jadwal['catatan'] }}</div>
+                @endif
 
-                <a href="{{ route('jadwal.edit', $index) }}" class="edit-btn">Edit</a>
+                <a href="{{ route('jadwal.edit', $jadwal['id']) }}" class="edit-btn">Edit</a>
 
-                <form action="{{ route('jadwal.destroy', $index) }}" method="POST" class="delete-form">
+                <form action="{{ route('jadwal.destroy', $jadwal['id']) }}" method="POST" class="delete-form">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus jadwal ini?')">Hapus</button>
@@ -181,6 +192,3 @@
         }
     </script>
 @endsection
-
-</body>
-</html>

@@ -45,6 +45,16 @@
         <div class="form-container">
             <h2 class="form-title">Tambah Jadwal Baru</h2>
 
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             @if (session('error'))
                 <div class="alert alert-danger text-center">
                     {{ session('error') }}
@@ -55,8 +65,8 @@
                 @csrf
                 
                 <div class="mb-3">
-                    <label for="nama" class="form-label">Nama Kegiatan</label>
-                    <input type="text" class="form-control" id="nama" name="nama" required placeholder="Contoh: Kelas Bahasa Inggris" value="{{ old('nama') }}">
+                    <label for="nama_jadwal" class="form-label">Nama Jadwal</label>
+                    <input type="text" class="form-control" id="nama_jadwal" name="nama_jadwal" required placeholder="Contoh: Kelas Bahasa Inggris" value="{{ old('nama_jadwal') }}">
                 </div>
                 
                 <div class="mb-3">
@@ -86,7 +96,7 @@
                     <div class="d-flex flex-wrap gap-2">
                         @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'] as $hari)
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="hari[]" value="{{ $hari }}" id="hari_{{ $loop->index }}" {{ is_array(old('hari')) && in_array($hari, old('hari')) ? 'checked' : '' }}>
+                                <input class="form-check-input" type="radio" name="hari" value="{{ $hari }}" id="hari_{{ $loop->index }}" {{ old('hari') == $hari ? 'checked' : '' }}>
                                 <label class="form-check-label" for="hari_{{ $loop->index }}">{{ $hari }}</label>
                             </div>
                         @endforeach
@@ -97,6 +107,7 @@
                     <label for="catatan" class="form-label">Catatan (Opsional)</label>
                     <textarea class="form-control" id="catatan" name="catatan" rows="2" placeholder="Tambahkan catatan jika perlu">{{ old('catatan') }}</textarea>
                 </div>
+                
                 
                 <div class="d-flex justify-content-between mt-4">
                     <a href="{{ route('jadwal.index') }}" class="btn btn-outline-secondary">Kembali</a>

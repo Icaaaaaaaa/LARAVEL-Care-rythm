@@ -3,20 +3,36 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Jadwal;
 
 class JadwalController extends Controller
 {
     public function index(Request $request)
     {
-        $jadwals = session()->get('jadwals', []);
+        $jadwals = Jadwal::all()->map(function($item) {
+            return [
+                'id' => $item->id,
+                'nama_jadwal' => $item->nama_jadwal,
+                'kategori' => $item->kategori,
+                'waktu_mulai' => $item->waktu_mulai,
+                'waktu_selesai' => $item->waktu_selesai,
+                'hari' => $item->hari,
+                'catatan' => $item->catatan,
+                'jam' => $item->jam,
+                'user_id' => $item->user_id,
+            ];
+        });
+        return view('Jadwal', compact('jadwals'));
+    }
 
-        if ($request->has('hari')) {
-            $jadwals = array_filter($jadwals, function ($jadwal) use ($request) {
-                return in_array($request->hari, explode(', ', $jadwal['hari']));
-            });
+    public function show($id)
+    {
+        $jadwal = Jadwal::find($id);
+        if (!$jadwal) {
+            return response()->json(['message' => 'Jadwal tidak ditemukan'], 404);
         }
-
-        return view('jadwal', compact('jadwals'));
+        return response()->json($jadwal);
     }
 
     public function create()
@@ -27,119 +43,81 @@ class JadwalController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'catatan' => 'nullable|string|max:255',
-            'kategori' => 'required|string|max:100',
+            'nama_jadwal' => 'required|string|max:100',
+            'kategori' => 'required|string|max:50',
             'waktu_mulai' => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-            'hari' => 'required|array',
+            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+            'catatan' => 'nullable|string',
         ]);
 
-        $jadwals = session()->get('jadwals', []);
-        $hariBaru = $request->hari;
-        $mulaiBaru = $request->waktu_mulai;
-        $selesaiBaru = $request->waktu_selesai;
+        $user = session('user');
+        $user_id = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : null);
 
-        foreach ($jadwals as $jadwal) {
-            $hariLama = explode(', ', $jadwal['hari']);
-            $waktu = explode(' - ', $jadwal['waktu']);
-            $mulaiLama = $waktu[0];
-            $selesaiLama = $waktu[1];
-
-            foreach ($hariBaru as $hari) {
-                if (in_array($hari, $hariLama)) {
-                    if (
-                        ($mulaiBaru < $selesaiLama) &&
-                        ($selesaiBaru > $mulaiLama)
-                    ) {
-                        return back()->withInput()->with('error', 'Jadwal tabrakan dengan jadwal yang sudah ada.');
-                    }
-                }
-            }
+        if (is_null($user_id)) {
+            return redirect()->back()->with('error', 'User belum login');
         }
 
-        $newJadwal = [
-            'nama' => $request->nama,
-            'catatan' => $request->catatan,
+        Jadwal::create([
+            'nama_jadwal' => $request->nama_jadwal,
             'kategori' => $request->kategori,
-            'waktu' => $request->waktu_mulai . ' - ' . $request->waktu_selesai,
-            'hari' => implode(', ', $request->hari)
-        ];
-
-        $jadwals[] = $newJadwal;
-        session()->put('jadwals', $jadwals);
+            'waktu_mulai' => $request->waktu_mulai,
+            'waktu_selesai' => $request->waktu_selesai,
+            'hari' => $request->hari,
+            'catatan' => $request->catatan,
+            'user_id' => $user_id,
+        ]);
 
         return redirect()->route('jadwal.index')->with('success', 'Jadwal berhasil ditambahkan!');
     }
 
     public function edit($id)
     {
-        $jadwals = session()->get('jadwals', []);
-        if (!isset($jadwals[$id])) {
-            return redirect()->route('jadwal.index')->with('error', 'Jadwal tidak ditemukan.');
-        }
-
-        $jadwal = $jadwals[$id];
-        return view('editjadwal', compact('jadwal', 'id'));
+        $jadwal = Jadwal::findOrFail($id);
+        return view('editjadwal', [
+            'jadwal' => $jadwal,
+            'id' => $id
+        ]);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'catatan' => 'nullable|string|max:255',
-            'kategori' => 'required|string|max:100',
+            'nama_jadwal' => 'required|string|max:100',
+            'kategori' => 'required|string|max:50',
             'waktu_mulai' => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-            'hari' => 'required|array',
+            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+            'catatan' => 'nullable|string',
         ]);
 
-        $jadwals = session()->get('jadwals', []);
-        $hariBaru = $request->hari;
-        $mulaiBaru = $request->waktu_mulai;
-        $selesaiBaru = $request->waktu_selesai;
+        $user = session('user');
+        $user_id = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : null);
 
-        foreach ($jadwals as $key => $jadwal) {
-            if ($key == $id) continue;
-
-            $hariLama = explode(', ', $jadwal['hari']);
-            $waktu = explode(' - ', $jadwal['waktu']);
-            $mulaiLama = $waktu[0];
-            $selesaiLama = $waktu[1];
-
-            foreach ($hariBaru as $hari) {
-                if (in_array($hari, $hariLama)) {
-                    if (
-                        ($mulaiBaru < $selesaiLama) &&
-                        ($selesaiBaru > $mulaiLama)
-                    ) {
-                        return back()->withInput()->with('error', 'Jadwal tabrakan dengan jadwal yang sudah ada.');
-                    }
-                }
-            }
+        if (is_null($user_id)) {
+            return redirect()->back()->with('error', 'User belum login');
         }
 
-        $jadwals[$id] = [
-            'nama' => $request->nama,
-            'catatan' => $request->catatan,
+        $jadwal = Jadwal::findOrFail($id);
+        $jadwal->update([
+            'nama_jadwal' => $request->nama_jadwal,
             'kategori' => $request->kategori,
-            'waktu' => $request->waktu_mulai . ' - ' . $request->waktu_selesai,
-            'hari' => implode(', ', $request->hari)
-        ];
+            'waktu_mulai' => $request->waktu_mulai,
+            'waktu_selesai' => $request->waktu_selesai,
+            'hari' => $request->hari,
+            'catatan' => $request->catatan,
+            'user_id' => $user_id,
+        ]);
 
-        session()->put('jadwals', $jadwals);
         return redirect()->route('jadwal.index')->with('success', 'Jadwal berhasil diupdate!');
     }
 
     public function destroy($id)
     {
-        $jadwals = session()->get('jadwals', []);
-        if (!isset($jadwals[$id])) {
-            return redirect()->route('jadwal.index')->with('error', 'Jadwal tidak ditemukan.');
+        $deleted = Jadwal::destroy($id);
+        if (!$deleted) {
+            return response()->json(['message' => 'Jadwal tidak ditemukan'], 404);
         }
-
-        unset($jadwals[$id]);
-        session()->put('jadwals', array_values($jadwals)); // Reindex array
         return redirect()->route('jadwal.index')->with('success', 'Jadwal berhasil dihapus!');
     }
 }

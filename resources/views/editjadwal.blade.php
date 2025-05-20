@@ -47,9 +47,9 @@
                 @method('PUT')
                 
                 <div class="mb-3">
-                    <label for="nama" class="form-label">Nama Kegiatan</label>
-                    <input type="text" class="form-control" id="nama" name="nama" required 
-                           value="{{ old('nama', $jadwal['nama'] ?? '') }}">
+                    <label for="nama_jadwal" class="form-label">Nama Jadwal</label>
+                    <input type="text" class="form-control" id="nama_jadwal" name="nama_jadwal" required 
+                           value="{{ old('nama_jadwal', $jadwal['nama_jadwal'] ?? '') }}">
                 </div>
                 
                 <div class="mb-3">
@@ -62,35 +62,27 @@
                     </select>
                 </div>
                 
-                @php
-                    $waktu = explode(' - ', $jadwal['waktu'] ?? '00:00 - 00:00');
-                @endphp
-                
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="waktu_mulai" class="form-label">Waktu Mulai</label>
                         <input type="time" class="form-control" id="waktu_mulai" name="waktu_mulai" 
-                               value="{{ old('waktu_mulai', $waktu[0] ?? '') }}" required>
+                               value="{{ old('waktu_mulai', $jadwal['waktu_mulai'] ?? '') }}" required>
                     </div>
                     <div class="col-md-6">
                         <label for="waktu_selesai" class="form-label">Waktu Selesai</label>
                         <input type="time" class="form-control" id="waktu_selesai" name="waktu_selesai" 
-                               value="{{ old('waktu_selesai', $waktu[1] ?? '') }}" required>
+                               value="{{ old('waktu_selesai', $jadwal['waktu_selesai'] ?? '') }}" required>
                     </div>
                 </div>
                 
                 <div class="mb-3">
                     <label class="form-label">Hari</label>
                     <div class="d-flex flex-wrap gap-2">
-                        @php
-                            $selectedHari = explode(', ', $jadwal['hari'] ?? '');
-                        @endphp
-                        
                         @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'] as $hari)
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="hari[]" 
+                                <input class="form-check-input" type="radio" name="hari" 
                                        value="{{ $hari }}" id="hari_{{ $loop->index }}"
-                                       {{ in_array($hari, $selectedHari) ? 'checked' : '' }}>
+                                       {{ (old('hari', $jadwal['hari'] ?? '') == $hari) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="hari_{{ $loop->index }}">{{ $hari }}</label>
                             </div>
                         @endforeach
@@ -100,6 +92,11 @@
                 <div class="mb-3">
                     <label for="catatan" class="form-label">Catatan (Opsional)</label>
                     <textarea class="form-control" id="catatan" name="catatan" rows="2">{{ old('catatan', $jadwal['catatan'] ?? '') }}</textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="jam" class="form-label">Jam</label>
+                    <input type="time" class="form-control" id="jam" name="jam" required value="{{ old('jam', $jadwal['jam'] ?? '') }}">
                 </div>
                 
                 <div class="d-flex justify-content-between mt-4">

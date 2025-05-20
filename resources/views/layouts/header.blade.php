@@ -19,7 +19,7 @@
         <!-- profil -->
         <div class="profil d-flex align-self-center py-3">
             <div class="nama-profil d-none d-md-block pe-3">
-                <h3>{{ session('user.name') }}</h3>
+                <h3>{{ session('user')->username ?? '' }}</h3>
                 <small class="text-muted">Pengguna</small>
             </div>
             <div class="dropdown-center">
