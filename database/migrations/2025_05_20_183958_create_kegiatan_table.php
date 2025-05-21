@@ -11,12 +11,15 @@ return new class extends Migration {
         if (!Schema::hasTable('kegiatan')) {
             Schema::create('kegiatan', function (Blueprint $table) {
                 $table->id();
+                $table->unsignedBigInteger('user_id'); // relasi ke akun
                 $table->string('kegiatan', 255);
                 $table->text('catatan')->nullable();
                 $table->date('tanggal');
                 $table->time('waktu_mulai');
                 $table->time('waktu_selesai');
                 $table->string('tempat', 255)->nullable();
+                // Foreign key constraint
+                $table->foreign('user_id')->references('id')->on('akun')->onDelete('cascade');
             });
         }
     }

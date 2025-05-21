@@ -2,9 +2,57 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Pencapaian;
 
 class PencapaianController extends Controller
 {
+    public function index()
+    {
+        $pencapaians = Pencapaian::where('user_id', auth()->id() ?? 1)->get();
+        return view('pencapaian.index', compact('pencapaians'));
+    }
+
+    public function tambah(Request $request)
+    {
+        $id = $request->input('id');
+        $pencapaian = Pencapaian::find($id);
+        if ($pencapaian) {
+            $pencapaian->jumlah += 1;
+            $pencapaian->save();
+        }
+        return redirect()->route('pencapaian.index')->with('success', 'Jumlah berhasil ditambah.');
+    }
+
+    public function reset()
+    {
+        // Hapus semua pencapaian milik user (atau semua jika belum ada auth)
+        Pencapaian::where('user_id', auth()->id() ?? 1)->delete();
+        return redirect()->route('pencapaian.index')->with('success', 'Semua pencapaian berhasil direset.');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'target' => 'required|integer',
+            'jumlah' => 'required|integer',
+            'kategori' => 'nullable|string|max:255',
+        ]);
+
+        $user_id = auth()->id() ?? 1;
+
+        Pencapaian::create([
+            'user_id' => $user_id,
+            'nama' => $request->nama,
+            'waktu_pencapaian' => now(),
+            'target' => $request->target,
+            'jumlah' => $request->jumlah,
+            'kategori' => $request->kategori,
+        ]);
+
+        return redirect()->route('pencapaian.index')->with('success', 'Pencapaian berhasil ditambahkan!');
+    }
+
     private function getData()
     {
         return session('pencapaian', [
@@ -18,21 +66,6 @@ class PencapaianController extends Controller
         session(['pencapaian' => $data]);
     }
 
-    public function index()
-    {
-        $data = $this->getData();
-        return view('pencapaian.index', compact('data'));
-    }
-
-    public function tambah(Request $request)
-    {
-        $data = $this->getData();
-        $index = $request->input('index');
-        $data[$index]['counter']++;
-        $this->saveData($data);
-        return redirect('/pencapaian');
-    }
-
     public function kurang(Request $request)
     {
         $data = $this->getData();
@@ -41,12 +74,6 @@ class PencapaianController extends Controller
             $data[$index]['counter']--;
         }
         $this->saveData($data);
-        return redirect('/pencapaian');
-    }
-
-    public function reset()
-    {
-        session()->forget('pencapaian');
         return redirect('/pencapaian');
     }
 
@@ -110,7 +137,6 @@ class PencapaianController extends Controller
 
         return redirect('/pencapaian')->with('success', 'Kegiatan diperbarui dan keterangan disimpan!');
     }
-
 
     public function hapus(Request $request){
         $index = $request->input('index');

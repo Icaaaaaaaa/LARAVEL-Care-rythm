@@ -47,7 +47,8 @@ class JadwalController extends Controller
             'kategori' => 'required|string|max:50',
             'waktu_mulai' => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+            'hari' => 'required|array|min:1',
+            'hari.*' => 'in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'catatan' => 'nullable|string',
         ]);
 
@@ -63,7 +64,7 @@ class JadwalController extends Controller
             'kategori' => $request->kategori,
             'waktu_mulai' => $request->waktu_mulai,
             'waktu_selesai' => $request->waktu_selesai,
-            'hari' => $request->hari,
+            'hari' => implode(',', $request->hari), // simpan sebagai string dipisah koma
             'catatan' => $request->catatan,
             'user_id' => $user_id,
         ]);

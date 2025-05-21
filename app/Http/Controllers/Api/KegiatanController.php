@@ -16,25 +16,25 @@ class KegiatanController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'kegiatan' => 'required|string|max:255',
-        'catatan' => 'nullable|string',
-        'tanggal' => 'required|date',
-        'waktu_mulai' => 'required|date_format:H:i',
-        'waktu_selesai' => 'required|date_format:H:i',
-        'tempat' => 'nullable|string|max:255',
-    ]);
+    {
+        $validated = $request->validate([
+            'kegiatan' => 'required|string|max:255',
+            'catatan' => 'nullable|string',
+            'tanggal' => 'required|date',
+            'waktu_mulai' => 'required|date_format:H:i',
+            'waktu_selesai' => 'required|date_format:H:i',
+            'tempat' => 'nullable|string|max:255',
+            'user_id' => 'required|integer', // tambahkan validasi user_id
+        ]);
 
-    $kegiatan = Kegiatan::create($validated);
+        $kegiatan = Kegiatan::create($validated);
 
-    return response()->json([
-        'status' => true,
-        'message' => 'Kegiatan berhasil ditambahkan.',
-        'data' => $kegiatan
-    ], 201);
-}
-
+        return response()->json([
+            'status' => true,
+            'message' => 'Kegiatan berhasil ditambahkan.',
+            'data' => $kegiatan
+        ], 201);
+    }
 
     public function show($id)
     {
@@ -68,6 +68,7 @@ class KegiatanController extends Controller
             'waktu_mulai' => 'sometimes|required|date_format:H:i',
             'waktu_selesai' => 'sometimes|required|date_format:H:i',
             'tempat' => 'nullable|string|max:255',
+            'user_id' => 'sometimes|required|integer', // tambahkan validasi user_id
         ]);
 
         $kegiatan->update($validated);

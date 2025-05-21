@@ -96,7 +96,8 @@
                     <div class="d-flex flex-wrap gap-2">
                         @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'] as $hari)
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="hari" value="{{ $hari }}" id="hari_{{ $loop->index }}" {{ old('hari') == $hari ? 'checked' : '' }}>
+                                <input class="form-check-input" type="checkbox" name="hari[]" value="{{ $hari }}" id="hari_{{ $loop->index }}"
+                                    {{ (is_array(old('hari')) && in_array($hari, old('hari'))) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="hari_{{ $loop->index }}">{{ $hari }}</label>
                             </div>
                         @endforeach
