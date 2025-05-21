@@ -15,11 +15,11 @@ class JadwalController extends Controller
         return response()->json(['success' => true, 'data' => $jadwals]);
     }
 
-    // GET /api/jadwal/{id}
-    public function show($id)
+    // GET /api/jadwal/{akun}
+    public function show($akun)
     {
-        $jadwal = Jadwal::find($id);
-        if (!$jadwal) {
+        $jadwal = Jadwal::where('user_id', $akun)->get();
+        if ($jadwal->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'Jadwal tidak ditemukan'], 404);
         }
         return response()->json(['success' => true, 'data' => $jadwal]);
@@ -76,10 +76,10 @@ class JadwalController extends Controller
         return response()->json(['success' => true, 'data' => $jadwal]);
     }
 
-    // PUT /api/jadwal/{id}
-    public function update(Request $request, $id)
+    // PUT /api/jadwal/{akun}
+    public function update(Request $request, $akun)
     {
-        $jadwal = Jadwal::find($id);
+        $jadwal = Jadwal::where('user_id', $akun)->first();
         if (!$jadwal) {
             return response()->json(['success' => false, 'message' => 'Jadwal tidak ditemukan'], 404);
         }
@@ -99,10 +99,10 @@ class JadwalController extends Controller
         return response()->json(['success' => true, 'data' => $jadwal]);
     }
 
-    // DELETE /api/jadwal/{id}
-    public function destroy($id)
+    // DELETE /api/jadwal/{akun}
+    public function destroy($akun)
     {
-        $jadwal = Jadwal::find($id);
+        $jadwal = Jadwal::where('user_id', $akun)->first();
         if (!$jadwal) {
             return response()->json(['success' => false, 'message' => 'Jadwal tidak ditemukan'], 404);
         }
