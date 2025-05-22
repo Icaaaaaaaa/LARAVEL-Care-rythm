@@ -62,10 +62,10 @@ class PencapaianController extends Controller
         return response()->json(['success' => true, 'data' => $pencapaian]);
     }
 
-    // PUT /api/pencapaian/{akun}
-    public function update(Request $request, $akun)
+    // PUT /api/pencapaian/{id}
+    public function update(Request $request, $id)
     {
-        $pencapaian = Pencapaian::where('user_id', $akun)->first();
+        $pencapaian = Pencapaian::find($id);
         if (!$pencapaian) {
             return response()->json(['success' => false, 'message' => 'Pencapaian tidak ditemukan'], 404);
         }
@@ -83,14 +83,15 @@ class PencapaianController extends Controller
         return response()->json(['success' => true, 'data' => $pencapaian]);
     }
 
-    // DELETE /api/pencapaian/{akun}
-    public function destroy($akun)
+    // DELETE /api/pencapaian/{id}
+    public function destroy($id)
     {
-        $pencapaian = Pencapaian::where('user_id', $akun)->first();
+        $pencapaian = Pencapaian::find($id);
         if (!$pencapaian) {
             return response()->json(['success' => false, 'message' => 'Pencapaian tidak ditemukan'], 404);
         }
         $pencapaian->delete();
         return response()->json(['success' => true, 'message' => 'Pencapaian berhasil dihapus']);
     }
+
 }
