@@ -3,83 +3,107 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Teman;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Teman;
+use App\Models\Akun;  // Model untuk tabel akun
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class TemanController extends Controller
 {
-    // Ambil semua data teman
+    // Tampilkan semua relasi pertemanan (optional)
     public function index()
     {
-        $temans = Teman::all();
-        return response()->json($temans);
+        return Teman::all();
     }
 
-    // Simpan data teman baru
-    public function store(Request $request)
+    // Tampilkan daftar teman untuk user tertentu dengan detail username dan email
+    public function show($userId)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'last_active' => 'required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request->file('photo')->store('photos', 'public');
-        }
-
-        $teman = Teman::create($data);
+        $temans = DB::table('teman')
+            ->join('akun', 'teman.teman_id', '=', 'akun.id')
+            ->where('teman.user_id', $userId)
+            ->select('akun.id', 'akun.username', 'akun.email', 'teman.created_at')
+            ->get();
 
         return response()->json([
-            'message' => 'Data teman berhasil disimpan',
-            'data' => $teman
+            'user_id' => $userId,
+            'temans' => $temans,
+        ]);
+    }
+
+    // Tambah relasi teman baru
+    public function store(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:akun,id',
+            'teman_id' => 'required|exists:akun,id|different:user_id',
+        ]);
+
+        $userId = $request->input('user_id');
+        $temanId = $request->input('teman_id');
+
+        $exists = Teman::where('user_id', $userId)
+            ->where('teman_id', $temanId)
+            ->exists();
+
+        if ($exists) {
+            return response()->json(['message' => 'Teman sudah ada'], 409);
+        }
+
+        $teman = Teman::create([
+            'user_id' => $userId,
+            'teman_id' => $temanId,
+        ]);
+
+        return response()->json([
+            'message' => 'Teman berhasil ditambahkan',
+            'data' => $teman,
         ], 201);
     }
 
-    // Tampilkan satu data teman
-    public function show(Teman $teman)
+    // Hapus relasi teman berdasarkan id teman (primary key tabel teman)
+    public function destroy($id)
     {
-        return response()->json($teman);
-    }
+        $teman = Teman::find($id);
 
-    // Update data teman
-    public function update(Request $request, Teman $teman)
-    {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'last_active' => 'required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        // Hapus foto lama jika ada
-        if ($request->hasFile('photo')) {
-            if ($teman->photo) {
-                Storage::disk('public')->delete($teman->photo);
-            }
-
-            $data['photo'] = $request->file('photo')->store('photos', 'public');
-        }
-
-        $teman->update($data);
-
-        return response()->json([
-            'message' => 'Data teman berhasil diupdate',
-            'data' => $teman
-        ]);
-    }
-
-    // Hapus data teman
-    public function destroy(Teman $teman)
-    {
-        if ($teman->photo) {
-            Storage::disk('public')->delete($teman->photo);
+        if (!$teman) {
+            return response()->json(['message' => 'Data teman tidak ditemukan'], 404);
         }
 
         $teman->delete();
 
-        return response()->json([
-            'message' => 'Data teman berhasil dihapus'
+        return response()->json(['message' => 'Teman berhasil dihapus']);
+    }
+
+    // Tambah user baru (akun)
+    public function tambahUser(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string|max:50',
+            'kataSandi' => 'required|string|min:6',
+            'email' => 'required|email|unique:akun,email',
+            'role' => 'required|in:user,admin',
         ]);
+
+        $user = Akun::create([
+            'username' => $request->username,
+            'kataSandi' => Hash::make($request->kataSandi),
+            'email' => $request->email,
+            'role' => $request->role,
+        ]);
+
+        return response()->json([
+            'message' => 'User berhasil ditambahkan',
+            'data' => $user,
+        ], 201);
+    }
+
+    // Method baru: Tampilkan semua user (untuk cek user lewat API)
+    public function listUsers()
+    {
+        $users = Akun::select('id', 'username', 'email', 'role')->get();
+
+        return response()->json($users);
     }
 }

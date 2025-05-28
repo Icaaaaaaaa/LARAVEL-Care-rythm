@@ -14,6 +14,12 @@ Route::get('/user', function (Request $request) {
 
 Route::post('login', [AuthController::class, 'login']);
 
+Route::get('/users', [TemanController::class, 'listUsers']);
+
+Route::post('/users', [TemanController::class, 'tambahUser']);
+
+Route::get('/teman/user/{userId}', [TemanController::class, 'show']);
+
 Route::apiResource('jadwal', JadwalController::class);
 
 Route::apiResource('kegiatan', KegiatanController::class);
