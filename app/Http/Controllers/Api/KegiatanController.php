@@ -17,6 +17,16 @@ class KegiatanController extends Controller
 
     public function store(Request $request)
     {
+        // Ambil token dari header Authorization
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
+        }
+
+        // Hilangkan prefix "Bearer " jika ada
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
         $validated = $request->validate([
             'kegiatan' => 'required|string|max:255',
             'catatan' => 'nullable|string',
