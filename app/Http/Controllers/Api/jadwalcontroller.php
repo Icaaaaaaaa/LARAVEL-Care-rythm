@@ -50,24 +50,30 @@ class JadwalController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Token tidak valid',
-                'token_dikirim' => $token, // debugging atau logging
+                'token_dikirim' => $token,
             ], 401);
         }
 
         // Validasi input dari request
         $validated = $request->validate([
-            'nama_jadwal' => 'required|string|max:100',
-            'kategori' => 'required|string|max:50',
-            'waktu_mulai' => 'required|date_format:H:i',
+            'nama_jadwal'   => 'required|string|max:100',
+            'kategori'      => 'required|string|max:50',
+            'waktu_mulai'   => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
-            'catatan' => 'nullable|string',
+            // Support multi hari (array atau string dipisah koma)
+            'hari'          => 'required',
+            'catatan'       => 'nullable|string|max:255',
         ]);
 
-        // Menambahkan user_id dari user yang terautentikasi
+        // Jika hari dikirim array, ubah ke string
+        if (is_array($validated['hari'])) {
+            $validated['hari'] = implode(',', $validated['hari']);
+        }
+
+        // Tambahkan user_id dari user yang terautentikasi
         $validated['user_id'] = $user->id;
 
-        // Menyimpan data jadwal ke database
+        // Simpan data jadwal ke database
         $jadwal = Jadwal::create($validated);
 
         return response()->json(['success' => true, 'data' => $jadwal]);

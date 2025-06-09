@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Akun;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -27,8 +28,8 @@ class AuthController extends Controller
                 ], 401);
             }
 
-            // Debug: tampilkan password dari database dan input
-            if ($credentials['password'] === $user->kataSandi) {
+            // Cek password terenkripsi (hash)
+            if (Hash::check($credentials['password'], $user->kataSandi)) {
                 // Generate token (panjang 60 karakter)
                 $token = bin2hex(random_bytes(30));
                 $user->api_token = $token;
@@ -37,7 +38,7 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Login berhasil',
-                    'user' => $user,
+                    'username' => $user->username,
                     'token' => $token
                 ]);
             } else {
