@@ -29,20 +29,22 @@ class JadwalController extends Controller
 
     // Menyimpan jadwal baru berdasarkan token pengguna
     // Endpoint: POST /api/jadwal/tambah
+    // Header Authorization: Bearer <token> akan otomatis dikirim dari Flutter.
+    // Di controller, ambil dengan $request->header('Authorization') seperti contoh di atas.
     public function store(Request $request)
     {
-        // Mengambil token dari header Authorization
+        // Ambil token dari header Authorization
         $token = $request->header('Authorization');
         if (!$token) {
             return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
         }
 
-        // Menghapus prefix 'Bearer ' dari token jika ada
+        // Jika format token adalah Bearer <token>, ambil hanya token-nya
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
 
-        // Mencari user berdasarkan api_token
+        // Cari user berdasarkan api_token
         $user = \App\Models\Akun::where('api_token', $token)->first();
 
         // Jika token tidak valid atau user tidak ditemukan
@@ -57,11 +59,12 @@ class JadwalController extends Controller
         // Validasi input dari request
         $validated = $request->validate([
             'nama_jadwal'   => 'required|string|max:100',
-            'kategori'      => 'required|string|max:50',
+            'kategori'      => 'required|string|in:Pelajaran,Olahraga,Hiburan,Lainnya',
             'waktu_mulai'   => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-            // Support multi hari (array atau string dipisah koma)
-            'hari'          => 'required',
+            // hari bisa array (multi select checkbox)
+            'hari'          => 'required|array',
+            'hari.*'        => 'in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'catatan'       => 'nullable|string|max:255',
         ]);
 
@@ -92,10 +95,11 @@ class JadwalController extends Controller
         // Validasi data yang akan diupdate
         $validated = $request->validate([
             'nama_jadwal' => 'required|string|max:100',
-            'kategori' => 'required|string|max:50',
+            'kategori' => 'required|string|in:Pelajaran,Olahraga,Hiburan,Lainnya',
             'waktu_mulai' => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+            'hari' => 'required|array',
+            'hari.*' => 'in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'catatan' => 'nullable|string',
         ]);
 
@@ -118,5 +122,18 @@ class JadwalController extends Controller
         $jadwal->delete();
 
         return response()->json(['success' => true, 'message' => 'Jadwal berhasil dihapus']);
+    }
+
+    // Kernel jadwal: daftar hari dan kategori yang diizinkan
+    // Endpoint: GET /api/jadwal/kernel
+    public function kernel()
+    {
+        $hari = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+        $kategori = ['Pelajaran','Olahraga','Hiburan','Lainnya'];
+        return response()->json([
+            'success' => true,
+            'hari' => $hari,
+            'kategori' => $kategori
+        ]);
     }
 }
