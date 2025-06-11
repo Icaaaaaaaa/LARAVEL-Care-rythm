@@ -10,19 +10,29 @@ class JadwalController extends Controller
 {
     public function index(Request $request)
     {
-        $jadwals = Jadwal::all()->map(function($item) {
-            return [
-                'id' => $item->id,
-                'nama_jadwal' => $item->nama_jadwal,
-                'kategori' => $item->kategori,
-                'waktu_mulai' => $item->waktu_mulai,
-                'waktu_selesai' => $item->waktu_selesai,
-                'hari' => $item->hari,
-                'catatan' => $item->catatan,
-                'jam' => $item->jam,
-                'user_id' => $item->user_id,
-            ];
-        });
+        // Ambil user id dari Auth, jika tidak ada fallback ke session
+        $userId = auth()->id();
+        if (!$userId) {
+            $user = session('user');
+            $userId = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : session('user_id'));
+        }
+
+        if (!$userId) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $query = Jadwal::query()->where('user_id', $userId);
+
+        // Perbaiki filter hari agar sesuai dengan format penyimpanan (jika multi hari, gunakan FIND_IN_SET)
+        if ($request->has('hari') && $request->hari) {
+            $query->where(function($q) use ($request) {
+                $q->whereRaw('FIND_IN_SET(?, hari)', [$request->hari]);
+            });
+        }
+
+        $jadwals = $query->get();
+
+        // Tidak perlu map jika field sudah sesuai, langsung kirim ke view
         return view('Jadwal', compact('jadwals'));
     }
 
@@ -37,6 +47,17 @@ class JadwalController extends Controller
 
     public function create()
     {
+        // Coba dapatkan user id dari Auth, jika tidak ada fallback ke session
+        $userId = auth()->id();
+        if (!$userId) {
+            $user = session('user');
+            $userId = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : session('user_id'));
+        }
+
+        if (!$userId) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
         return view('tambahjadwal');
     }
 
@@ -52,8 +73,12 @@ class JadwalController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        $user = session('user');
-        $user_id = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : null);
+        // Coba dapatkan user id dari Auth, jika tidak ada fallback ke session
+        $user_id = auth()->id();
+        if (!$user_id) {
+            $user = session('user');
+            $user_id = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : session('user_id'));
+        }
 
         if (is_null($user_id)) {
             return redirect()->back()->with('error', 'User belum login');
@@ -88,12 +113,12 @@ class JadwalController extends Controller
             'kategori' => 'required|string|max:50',
             'waktu_mulai' => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
-            'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
+            'hari' => 'required|array|min:1',
+            'hari.*' => 'in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'catatan' => 'nullable|string',
         ]);
 
-        $user = session('user');
-        $user_id = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : null);
+        $user_id = auth()->id();
 
         if (is_null($user_id)) {
             return redirect()->back()->with('error', 'User belum login');
@@ -105,7 +130,7 @@ class JadwalController extends Controller
             'kategori' => $request->kategori,
             'waktu_mulai' => $request->waktu_mulai,
             'waktu_selesai' => $request->waktu_selesai,
-            'hari' => $request->hari,
+            'hari' => implode(',', $request->hari), // simpan sebagai string dipisah koma
             'catatan' => $request->catatan,
             'user_id' => $user_id,
         ]);

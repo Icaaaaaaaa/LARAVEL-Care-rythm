@@ -6,6 +6,7 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\PencapaianController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RegisterController;
 
 Route::get('/home', [HomeController::class, 'index']);
 
@@ -29,7 +30,7 @@ Route::resource('/kegiatan', KegiatanController::class);
 Route::get('/pencapaian', [PencapaianController::class, 'index'])->name('pencapaian.index');
 Route::post('/pencapaian/reset', [PencapaianController::class, 'reset'])->name('pencapaian.reset');
 Route::post('/pencapaian', [PencapaianController::class, 'store'])->name('pencapaian.store');
-Route::post('/pencapaian/tambah', [PencapaianController::class, 'tambah']);
+Route::post('/pencapaian/tambah', [PencapaianController::class, 'tambah'])->name('pencapaian.tambah');
 Route::post('/pencapaian/kurang', [PencapaianController::class, 'kurang']);
 Route::post('/pencapaian/tambah-kegiatan', [PencapaianController::class, 'tambahKegiatan']);
 Route::post('/pencapaian/hapus', [PencapaianController::class, 'hapus']);
@@ -46,3 +47,7 @@ Route::prefix('jadwal')->group(function () {
     Route::put('/{id}', [JadwalController::class, 'update'])->name('jadwal.update');
     Route::delete('/{id}', [JadwalController::class, 'destroy'])->name('jadwal.destroy'); 
 });
+
+// Register
+Route::get('/buatakun', [RegisterController::class, 'showForm'])->name('buatakun');
+Route::post('/register', [RegisterController::class, 'register'])->name('register');

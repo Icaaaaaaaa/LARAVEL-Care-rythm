@@ -27,12 +27,22 @@
             margin-top: 2rem;
         }
         .card-custom {
-            background: #ececec; /* sedikit lebih silver */
+            background: #ececec;
             border-radius: 1.2rem;
             color: #4b006e;
             box-shadow: 0 2px 16px rgba(130,90,200,0.10);
-            max-height: 500px; /* tinggi maksimum card jadwal */
-            overflow-y: auto;  /* scroll hanya di dalam card */
+            max-height: 500px;
+            overflow-y: auto;
+            /* Hide scrollbar but keep scroll functionality */
+            scrollbar-width: thin;
+            scrollbar-color: transparent transparent;
+        }
+        .card-custom::-webkit-scrollbar {
+            width: 8px;
+            background: transparent;
+        }
+        .card-custom::-webkit-scrollbar-thumb {
+            background: transparent;
         }
         .rounded-btn {
             border-radius: 2rem;
@@ -171,22 +181,35 @@
             <div class="row mb-4">
                 <div class="col-8">
                     <div class="card card-custom p-3">
-                        <h6 class="fw-bold mb-3">Catatan kegiatan</h6>
+                        <h6 class="fw-bold mb-3">Pencapaian</h6>
                         <div class="d-flex gap-3 mb-3">
-                            <div class="text-center flex-fill">
-                                <div class="display-6 fw-bold">10</div>
-                                <div class="small">Olahraga</div>
-                            </div>
-                            <div class="text-center flex-fill">
-                                <div class="display-6 fw-bold">12</div>
-                                <div class="small">Belajar</div>
-                            </div>
-                            <div class="text-center flex-fill">
-                                <div class="display-6 fw-bold">4</div>
-                                <div class="small">Membaca</div>
-                            </div>
+                            @foreach($pencapaians as $pencapaian)
+                                <div class="text-center flex-fill">
+                                    <div class="display-6 fw-bold">
+                                        {{ is_array($pencapaian) ? ($pencapaian['jumlah'] ?? 0) : ($pencapaian->jumlah ?? 0) }}
+                                    </div>
+                                    <div class="small">
+                                        {{ is_array($pencapaian) ? ($pencapaian['kategori'] ?? '-') : ($pencapaian->kategori ?? '-') }}
+                                    </div>
+                                    <form action="{{ url('/pencapaian/tambah') }}" method="POST" class="mt-2">
+                                        @csrf
+                                        @php
+                                            // Ambil id pencapaian yang valid untuk user dan kategori ini
+                                            $kategori = is_array($pencapaian) ? ($pencapaian['kategori'] ?? null) : ($pencapaian->kategori ?? null);
+                                            $user = Auth::check() ? Auth::user() : (session('user') ?? null);
+                                            $user_id = $user ? (is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : session('user_id'))) : null;
+                                            $pencapaianObj = \App\Models\Pencapaian::where('user_id', $user_id)
+                                                ->where('kategori', $kategori)
+                                                ->orderByDesc('waktu_pencapaian')
+                                                ->first();
+                                        @endphp
+                                        <input type="hidden" name="id" value="{{ $pencapaianObj ? $pencapaianObj->id : '' }}">
+                                        <button type="submit" class="btn btn-sm btn-success rounded-btn" title="Tambah jumlah" {{ !$pencapaianObj ? 'disabled' : '' }}>+</button>
+                                    </form>
+                                </div>
+                            @endforeach
                         </div>
-                        <button class="btn btn-outline-purple rounded-btn">Ubah target</button>
+                        <!-- Hanya jumlah yang bertambah, field lain tetap -->
                     </div>
                 </div>
                 <div class="col-4">

@@ -3,18 +3,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Jadwal;
+use App\Models\Pencapaian;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        // Jika ingin semua jadwal:
-        // $jadwals = Jadwal::all();
+        // Ambil user id dari auth, jika tidak ada fallback ke session
+        $user_id = auth()->id();
+        if (!$user_id) {
+            $user = session('user');
+            $user_id = is_array($user) ? ($user['id'] ?? null) : (is_object($user) ? ($user->id ?? null) : session('user_id'));
+        }
 
-        // Jika ingin jadwal user yang login:
-        // $jadwals = Jadwal::where('user_id', auth()->id())->get();
+        $jadwals = Jadwal::where('user_id', $user_id)->get();
 
-        $jadwals = Jadwal::all(); // atau filter sesuai kebutuhan
-        return view('welcome', compact('jadwals'));
+        $pencapaians = Pencapaian::where('user_id', $user_id)
+            ->select('kategori', \DB::raw('SUM(jumlah) as jumlah'))
+            ->groupBy('kategori')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'kategori' => $item->kategori,
+                    'jumlah' => $item->jumlah
+                ];
+            });
+
+        return view('welcome', [
+            'jadwals' => $jadwals,
+            'pencapaians' => $pencapaians,
+        ]);
     }
 }

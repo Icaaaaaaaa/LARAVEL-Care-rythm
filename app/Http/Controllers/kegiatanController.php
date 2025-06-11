@@ -28,6 +28,26 @@ class KegiatanController extends Controller
             'tempat' => 'nullable|string|max:255',
         ]);
 
+        // Pastikan user_id selalu diisi
+        $validated['user_id'] = auth()->id() ?? session('user_id') ?? 1;
+
+        // Cek tabrakan waktu pada tanggal yang sama
+        $bentrok = \App\Models\Kegiatan::where('user_id', $validated['user_id'])
+            ->where('tanggal', $validated['tanggal'])
+            ->where(function($q) use ($validated) {
+                $q->where(function($q2) use ($validated) {
+                    $q2->where('waktu_mulai', '<', $validated['waktu_selesai'])
+                       ->where('waktu_selesai', '>', $validated['waktu_mulai']);
+                });
+            })
+            ->exists();
+
+        if ($bentrok) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['waktu_mulai' => 'Waktu kegiatan bertabrakan dengan jadwal lain pada tanggal yang sama.']);
+        }
+
         Kegiatan::create($validated);
         return redirect()->route('kegiatan.index')->with('success', 'Kegiatan berhasil ditambahkan.');
     }

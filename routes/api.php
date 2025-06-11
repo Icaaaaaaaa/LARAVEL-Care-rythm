@@ -14,12 +14,6 @@ Route::get('/user', function (Request $request) {
 
 Route::post('login', [AuthController::class, 'login']);
 
-Route::get('/users', [TemanController::class, 'listUsers']);
-
-Route::post('/users', [TemanController::class, 'tambahUser']);
-
-Route::get('/teman/user/{userId}', [TemanController::class, 'show']);
-
 Route::apiResource('jadwal', JadwalController::class);
 
 Route::apiResource('kegiatan', KegiatanController::class);
@@ -27,3 +21,5 @@ Route::apiResource('kegiatan', KegiatanController::class);
 Route::apiResource('pencapaian', PencapaianController::class);
 
 Route::apiResource('teman', TemanController::class);
+
+Route::get('jadwal/by-token', [JadwalController::class, 'getByToken']);

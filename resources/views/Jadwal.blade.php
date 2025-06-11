@@ -117,15 +117,18 @@
             
             <div class="filter-group">
                 <div class="input-group">
-                    <select class="form-select form-select-sm" name="hari" style="width: 120px;">
-                        <option value="Senin">Senin</option>
-                        <option value="Selasa">Selasa</option>
-                        <option value="Rabu">Rabu</option>
-                        <option value="Kamis">Kamis</option>
-                        <option value="Jumat">Jumat</option>
-                        <option value="Sabtu">Sabtu</option>
-                        <option value="Minggu">Minggu</option>
-                    </select>
+                    <form method="GET" action="{{ route('jadwal.index') }}">
+                        <select class="form-select form-select-sm" name="hari" style="width: 120px;" onchange="this.form.submit()">
+                            <option value="">Semua</option>
+                            <option value="Senin" {{ request('hari') == 'Senin' ? 'selected' : '' }}>Senin</option>
+                            <option value="Selasa" {{ request('hari') == 'Selasa' ? 'selected' : '' }}>Selasa</option>
+                            <option value="Rabu" {{ request('hari') == 'Rabu' ? 'selected' : '' }}>Rabu</option>
+                            <option value="Kamis" {{ request('hari') == 'Kamis' ? 'selected' : '' }}>Kamis</option>
+                            <option value="Jumat" {{ request('hari') == 'Jumat' ? 'selected' : '' }}>Jumat</option>
+                            <option value="Sabtu" {{ request('hari') == 'Sabtu' ? 'selected' : '' }}>Sabtu</option>
+                            <option value="Minggu" {{ request('hari') == 'Minggu' ? 'selected' : '' }}>Minggu</option>
+                        </select>
+                    </form>
                 </div>
                 
                 <div class="dropdown">
@@ -140,26 +143,31 @@
             </div>
         </div>
 
-        @forelse($jadwals as $jadwal)
+        @php
+            // Tidak perlu filter lagi di view, karena controller sudah mengirimkan jadwal user yang login
+            $jadwalsUser = $jadwals;
+        @endphp
+
+        @forelse($jadwalsUser as $jadwal)
             <div class="jadwal-item">
-                <span class="hari-label">{{ $jadwal['hari'] }}</span>
-                <h4>{{ $jadwal['nama_jadwal'] }}</h4>
+                <span class="hari-label">{{ $jadwal->hari }}</span>
+                <h4>{{ $jadwal->nama_jadwal }}</h4>
                 <div class="waktu">
-                    {{ $jadwal['waktu_mulai'] ?? $jadwal['jam'] }} 
-                    @if(!empty($jadwal['waktu_selesai']))
-                        - {{ $jadwal['waktu_selesai'] }}
+                    {{ $jadwal->waktu_mulai ?? $jadwal->jam }}
+                    @if(!empty($jadwal->waktu_selesai))
+                        - {{ $jadwal->waktu_selesai }}
                     @endif
                 </div>
-                @if(!empty($jadwal['kategori']))
-                    <div><strong>Kategori:</strong> {{ $jadwal['kategori'] }}</div>
+                @if(!empty($jadwal->kategori))
+                    <div><strong>Kategori:</strong> {{ $jadwal->kategori }}</div>
                 @endif
-                @if(!empty($jadwal['catatan']))
-                    <div><strong>Catatan:</strong> {{ $jadwal['catatan'] }}</div>
+                @if(!empty($jadwal->catatan))
+                    <div><strong>Catatan:</strong> {{ $jadwal->catatan }}</div>
                 @endif
 
-                <a href="{{ route('jadwal.edit', $jadwal['id']) }}" class="edit-btn">Edit</a>
+                <a href="{{ route('jadwal.edit', $jadwal->id) }}" class="edit-btn">Edit</a>
 
-                <form action="{{ route('jadwal.destroy', $jadwal['id']) }}" method="POST" class="delete-form">
+                <form action="{{ route('jadwal.destroy', $jadwal->id) }}" method="POST" class="delete-form">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus jadwal ini?')">Hapus</button>

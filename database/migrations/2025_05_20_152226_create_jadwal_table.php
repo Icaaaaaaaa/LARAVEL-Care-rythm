@@ -14,9 +14,9 @@ return new class extends Migration {
             $table->string('kategori', 50);
             $table->time('waktu_mulai');
             $table->time('waktu_selesai');
-            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
+            $table->string('hari', 50); 
             $table->string('catatan', 255)->nullable();
-            $table->foreign('user_id')->references('id')->on('akun')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('akun')->onDelete('cascade');
         });
     }
 
