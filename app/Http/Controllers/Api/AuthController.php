@@ -56,4 +56,35 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function register(Request $request)
+    {
+        try {
+            $request->validate([
+                'username' => 'required|string|max:50|unique:akun,username',
+                'email' => 'required|email|unique:akun,email',
+                'password' => 'required|string|min:3',
+            ]);
+
+            $user = new Akun();
+            $user->username = $request->username;
+            $user->email = $request->email;
+            $user->kataSandi = \Illuminate\Support\Facades\Hash::make($request->password);
+            // Generate api_token langsung setelah register
+            $user->api_token = bin2hex(random_bytes(30));
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Registrasi berhasil',
+                'username' => $user->username,
+                'token' => $user->api_token
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

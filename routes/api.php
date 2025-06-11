@@ -14,6 +14,8 @@ Route::get('/user', function (Request $request) {
 
 Route::post('login', [AuthController::class, 'login']);
 
+Route::post('register', [AuthController::class, 'register']);
+
 Route::apiResource('jadwal', JadwalController::class);
 
 Route::apiResource('kegiatan', KegiatanController::class);
@@ -21,3 +23,5 @@ Route::apiResource('kegiatan', KegiatanController::class);
 Route::apiResource('pencapaian', PencapaianController::class);
 
 Route::apiResource('teman', TemanController::class);
+
+Route::get('jadwal/by-token', [JadwalController::class, 'getByToken']);

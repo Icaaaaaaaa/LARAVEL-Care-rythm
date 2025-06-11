@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->time('waktu_selesai');
             $table->string('hari', 50); 
             $table->string('catatan', 255)->nullable();
-            $table->foreign('user_id')->references('id')->on('akun')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('akun')->onDelete('cascade');
         });
     }
 

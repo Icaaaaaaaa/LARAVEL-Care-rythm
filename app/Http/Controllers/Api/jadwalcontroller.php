@@ -136,4 +136,36 @@ class JadwalController extends Controller
             'kategori' => $kategori
         ]);
     }
+
+    // Mendapatkan semua jadwal user berdasarkan token
+    public function getByToken(Request $request)
+    {
+        // Ambil token dari header Authorization
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
+        }
+
+        // Jika format token adalah Bearer <token>, ambil hanya token-nya
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        // Cari user berdasarkan api_token
+        $user = \App\Models\Akun::where('api_token', $token)->first();
+
+        // Jika token tidak valid atau user tidak ditemukan
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak valid',
+                'token_dikirim' => $token,
+            ], 401);
+        }
+
+        // Ambil semua jadwal milik user
+        $jadwals = \App\Models\Jadwal::where('user_id', $user->id)->get();
+
+        return response()->json(['success' => true, 'data' => $jadwals]);
+    }
 }
