@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'], // Ganti sesuai domain frontend di produksi
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 

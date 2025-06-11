@@ -7,11 +7,31 @@ use Illuminate\Http\Request;
 
 class KegiatanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Ambil token dari header Authorization
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
+        }
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user = \App\Models\Akun::where('api_token', $token)->first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak valid',
+                'token_dikirim' => $token,
+            ], 401);
+        }
+
+        // Ambil hanya kegiatan milik user tersebut
+        $kegiatan = Kegiatan::where('user_id', $user->id)->get();
+
         return response()->json([
             'status' => true,
-            'data' => Kegiatan::all()
+            'data' => $kegiatan,
         ]);
     }
 
@@ -22,16 +42,10 @@ class KegiatanController extends Controller
         if (!$token) {
             return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
         }
-
-        // Jika format token adalah Bearer <token>, ambil hanya token-nya
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-
-        // Cari user berdasarkan api_token
         $user = \App\Models\Akun::where('api_token', $token)->first();
-
-        // Jika token tidak valid atau user tidak ditemukan
         if (!$user) {
             return response()->json([
                 'success' => false,
@@ -112,7 +126,6 @@ class KegiatanController extends Controller
             'waktu_mulai' => 'sometimes|required|date_format:H:i',
             'waktu_selesai' => 'sometimes|required|date_format:H:i',
             'tempat' => 'nullable|string|max:255',
-            // 'user_id' tidak perlu divalidasi/diupdate manual
         ]);
 
         $kegiatan->update($validated);
