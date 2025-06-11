@@ -26,7 +26,7 @@ class KegiatanController extends Controller
             ], 401);
         }
 
-        // Ambil hanya kegiatan milik user tersebut
+        // Ambil hanya kegiatan milik 1 user_id 
         $kegiatan = Kegiatan::where('user_id', $user->id)->get();
 
         return response()->json([
