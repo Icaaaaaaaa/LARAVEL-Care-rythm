@@ -26,7 +26,7 @@ class KegiatanController extends Controller
             ], 401);
         }
 
-        // Ambil hanya kegiatan milik 1 user_id 
+
         $kegiatan = Kegiatan::where('user_id', $user->id)->get();
 
         return response()->json([
@@ -118,6 +118,13 @@ class KegiatanController extends Controller
                 'message' => 'Kegiatan tidak ditemukan.'
             ], 404);
         }
+        //edit
+        if ($kegiatan->user_id !== $user->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'kegiatan tidak di temukan.'
+            ], 403);
+        }
 
         $validated = $request->validate([
             'kegiatan' => 'sometimes|required|string|max:255',
@@ -163,6 +170,15 @@ class KegiatanController extends Controller
                 'message' => 'Kegiatan tidak ditemukan.'
             ], 404);
         }
+
+        // hapus
+        if ($kegiatan->user_id !== $user->id) {
+            return response()->json([
+                'status' => false,
+                'message' => 'kegiatan tidak di temukan.'
+            ], 403);
+        }
+
         $kegiatan->delete();
 
         return response()->json([
