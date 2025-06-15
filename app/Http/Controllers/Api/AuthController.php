@@ -30,6 +30,8 @@ class AuthController extends Controller
 
             // Cek password terenkripsi (hash)
             if (Hash::check($credentials['password'], $user->kataSandi)) {
+                // Simpan username ke session
+                session(['username' => $user->username]);
                 // Generate token (panjang 60 karakter)
                 $token = bin2hex(random_bytes(30));
                 $user->api_token = $token;

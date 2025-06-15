@@ -10,9 +10,24 @@ use App\Models\Akun;
 class PencapaianController extends Controller
 {
     // GET /api/pencapaian
-    public function index()
+    // Menampilkan semua pencapaian milik user yang sedang login (berdasarkan token)
+    public function index(Request $request)
     {
-        $data = Pencapaian::all();
+        // Ambil token dari header Authorization
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
+        }
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user = Akun::where('api_token', $token)->first();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Token tidak valid'], 401);
+        }
+
+        // Ambil pencapaian berdasarkan user_id
+        $data = Pencapaian::where('user_id', $user->id)->get();
         return response()->json(['success' => true, 'data' => $data]);
     }
 

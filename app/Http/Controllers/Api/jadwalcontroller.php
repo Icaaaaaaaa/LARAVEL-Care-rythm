@@ -8,11 +8,29 @@ use App\Models\Jadwal;
 
 class JadwalController extends Controller
 {
-    // Menampilkan semua jadwal (untuk semua user)
+    // Menampilkan semua jadwal milik user yang sedang login (berdasarkan token)
     // Endpoint: GET /api/jadwal
-    public function index()
+    public function index(Request $request)
     {
-        $jadwals = Jadwal::all();
+        // Ambil token dari header Authorization
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
+        }
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user = \App\Models\Akun::where('api_token', $token)->first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak valid',
+                'token_dikirim' => $token,
+            ], 401);
+        }
+
+        // Ambil jadwal berdasarkan user_id
+        $jadwals = Jadwal::where('user_id', $user->id)->get();
         return response()->json(['success' => true, 'data' => $jadwals]);
     }
 
@@ -177,61 +195,5 @@ class JadwalController extends Controller
             'hari' => $hari,
             'kategori' => $kategori
         ]);
-    }
-
-    // Mendapatkan user id berdasarkan token di header Authorization
-    // Endpoint: GET /api/jadwal/user-id
-    public function getUserIdByToken(Request $request)
-    {
-        $token = $request->header('Authorization');
-        if (!$token) {
-            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
-        }
-
-        // Jika format token adalah Bearer <token>, ambil hanya token-nya
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $user = \App\Models\Akun::where('api_token', $token)->first();
-
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Token tidak valid'], 401);
-        }
-
-        return response()->json(['success' => true, 'user_id' => $user->id]);
-    }
-
-    // Mendapatkan semua jadwal milik user yang sedang login (berdasarkan token)
-    // Endpoint: GET /api/jadwal/my
-    public function getMyJadwal(Request $request)
-    {
-        $token = $request->header('Authorization');
-        if (!$token) {
-            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
-        }
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $user = \App\Models\Akun::where('api_token', $token)->first();
-
-        if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Token tidak valid', 'token' => $token], 401);
-        }
-
-        $jadwals = Jadwal::where('user_id', $user->id)->get();
-
-        if ($jadwals->isEmpty()) {
-            // Tambahkan info user id untuk debug
-            return response()->json([
-                'success' => false,
-                'message' => 'Jadwal tidak ditemukan',
-                'user_id' => $user->id
-            ], 404);
-        }
-
-        return response()->json(['success' => true, 'data' => $jadwals]);
     }
 }

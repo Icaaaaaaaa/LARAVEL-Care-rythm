@@ -7,18 +7,24 @@ use Illuminate\Http\Request;
 
 class KegiatanController extends Controller
 {
+    // Menampilkan semua kegiatan milik user yang sedang login (berdasarkan token)
+    // Endpoint: GET /api/kegiatan
     public function index(Request $request)
     {
         // Ambil token dari header Authorization
         $token = $request->header('Authorization');
         if (!$token) {
+            // Token tidak ditemukan di header
             return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
         }
+        // Jika format token adalah Bearer <token>, ambil hanya token-nya
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
+        // Cari user berdasarkan api_token
         $user = \App\Models\Akun::where('api_token', $token)->first();
         if (!$user) {
+            // Token tidak valid atau user tidak ditemukan
             return response()->json([
                 'success' => false,
                 'message' => 'Token tidak valid',
@@ -35,6 +41,8 @@ class KegiatanController extends Controller
         ]);
     }
 
+    // Menyimpan kegiatan baru berdasarkan token pengguna
+    // Endpoint: POST /api/kegiatan
     public function store(Request $request)
     {
         // Ambil token dari header Authorization
@@ -77,6 +85,8 @@ class KegiatanController extends Controller
         ], 201);
     }
 
+    // Menampilkan detail kegiatan berdasarkan id
+    // Endpoint: GET /api/kegiatan/{id}
     public function show($id)
     {
         $kegiatan = Kegiatan::find($id);
@@ -92,6 +102,8 @@ class KegiatanController extends Controller
         ]);
     }
 
+    // Memperbarui kegiatan berdasarkan id kegiatan
+    // Endpoint: PUT /api/kegiatan/{id}
     public function update(Request $request, $id)
     {
         // Ambil token dari header Authorization
@@ -144,6 +156,8 @@ class KegiatanController extends Controller
         ]);
     }
 
+    // Menghapus kegiatan berdasarkan id kegiatan
+    // Endpoint: DELETE /api/kegiatan/{id}
     public function destroy(Request $request, $id)
     {
         // Ambil token dari header Authorization
