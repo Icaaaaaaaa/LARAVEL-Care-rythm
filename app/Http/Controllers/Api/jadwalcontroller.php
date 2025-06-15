@@ -82,14 +82,32 @@ class JadwalController extends Controller
         return response()->json(['success' => true, 'data' => $jadwal]);
     }
 
-    // Memperbarui jadwal berdasarkan user_id (akun)
-    // Endpoint: PUT /api/jadwal/{akun}
-    public function update(Request $request, $akun)
+    // Memperbarui jadwal berdasarkan id jadwal
+    // Endpoint: PUT /api/jadwal/{id}
+    public function update(Request $request, $id)
     {
-        // Ambil jadwal pertama milik user yang sesuai
-        $jadwal = Jadwal::where('user_id', $akun)->first();
+        // Ambil token dari header Authorization
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
+        }
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user = \App\Models\Akun::where('api_token', $token)->first();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Token tidak valid'], 401);
+        }
+
+        // Cari jadwal berdasarkan id
+        $jadwal = Jadwal::find($id);
         if (!$jadwal) {
             return response()->json(['success' => false, 'message' => 'Jadwal tidak ditemukan'], 404);
+        }
+
+        // Pastikan hanya pemilik jadwal yang bisa update
+        if ($jadwal->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Anda tidak berhak mengedit jadwal ini'], 403);
         }
 
         // Validasi data yang akan diupdate
@@ -103,19 +121,43 @@ class JadwalController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
+        // Jika hari dikirim array, ubah ke string
+        if (is_array($validated['hari'])) {
+            $validated['hari'] = implode(',', $validated['hari']);
+        }
+
         // Update data jadwal
         $jadwal->update($validated);
 
         return response()->json(['success' => true, 'data' => $jadwal]);
     }
 
-    // Menghapus jadwal berdasarkan user_id (akun)
-    // Endpoint: DELETE /api/jadwal/{akun}
-    public function destroy($akun)
+    // Menghapus jadwal berdasarkan id jadwal
+    // Endpoint: DELETE /api/jadwal/{id}
+    public function destroy(Request $request, $id)
     {
-        $jadwal = Jadwal::where('user_id', $akun)->first();
+        // Ambil token dari header Authorization
+        $token = $request->header('Authorization');
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token tidak ditemukan'], 401);
+        }
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user = \App\Models\Akun::where('api_token', $token)->first();
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Token tidak valid'], 401);
+        }
+
+        // Cari jadwal berdasarkan id
+        $jadwal = Jadwal::find($id);
         if (!$jadwal) {
             return response()->json(['success' => false, 'message' => 'Jadwal tidak ditemukan'], 404);
+        }
+
+        // Pastikan hanya pemilik jadwal yang bisa hapus
+        if ($jadwal->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Anda tidak berhak menghapus jadwal ini'], 403);
         }
 
         // Hapus jadwal

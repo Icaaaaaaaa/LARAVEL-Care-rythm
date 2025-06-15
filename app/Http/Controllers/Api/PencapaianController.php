@@ -55,9 +55,17 @@ class PencapaianController extends Controller
             'kategori' => 'nullable|string|max:50',
         ]);
 
+        if ($validated['jumlah'] > $validated['target']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jumlah tidak boleh melebihi target. Data tidak bisa ditambah.'
+            ], 422);
+        }
+
         $validated['user_id'] = $user->id;
 
         $pencapaian = Pencapaian::create($validated);
+
 
         return response()->json(['success' => true, 'data' => $pencapaian]);
     }
@@ -78,7 +86,22 @@ class PencapaianController extends Controller
             'kategori' => 'nullable|string|max:50',
         ]);
 
+        if ($validated['jumlah'] > $validated['target']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Jumlah tidak boleh melebihi target. Data tidak bisa diupdate.'
+            ], 422);
+        }
+
         $pencapaian->update($validated);
+
+        if ($validated['jumlah'] == $validated['target']) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Pencapaian selesai!',
+                'data' => $pencapaian
+            ]);
+        }
 
         return response()->json(['success' => true, 'data' => $pencapaian]);
     }
@@ -93,5 +116,4 @@ class PencapaianController extends Controller
         $pencapaian->delete();
         return response()->json(['success' => true, 'message' => 'Pencapaian berhasil dihapus']);
     }
-
 }
