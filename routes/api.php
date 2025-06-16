@@ -19,6 +19,7 @@ Route::apiResource('jadwal', JadwalController::class);
 Route::apiResource('kegiatan', KegiatanController::class);
 
 Route::apiResource('pencapaian', PencapaianController::class);
+Route::post('/pencapaian/tambah', [PencapaianController::class, 'store']);
 
 Route::apiResource('teman', TemanController::class);
 
