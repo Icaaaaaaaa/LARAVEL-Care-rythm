@@ -1,53 +1,53 @@
 <?php
 
-// use Illuminate\Support\Facades\Route;
-// use App\Http\Controllers\LoginController;
-// use App\Http\Controllers\KegiatanController;
-// use App\Http\Controllers\PencapaianController;
-// use App\Http\Controllers\JadwalController;
-// use App\Http\Controllers\HomeController;
-// use App\Http\Controllers\RegisterController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\PencapaianController;
+use App\Http\Controllers\JadwalController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RegisterController;
 
-// Route::get('/home', [HomeController::class, 'index']);
+Route::get('/home', [HomeController::class, 'index']);
 
-// // Login
-// Route::get('/', function () {
-//     return view('landing.splash');
-// })->name('splash');
-// // Hapus/komentari baris berikut agar tidak menimpa splash:
-// // Route::get('/', [LoginController::class, 'landing'])->name('landing');
+// Login
+Route::get('/', function () {
+    return view('landing.splash');
+})->name('splash');
+// Hapus/komentari baris berikut agar tidak menimpa splash:
+// Route::get('/', [LoginController::class, 'landing'])->name('landing');
 
-// Route::get('/login', function () {
-//     return view('landing.login');
-// })->name('login');
-// Route::post('/login', [LoginController::class, 'login']);
-// Route::post('/logout', [LoginController::class, 'logout']);
+Route::get('/login', function () {
+    return view('landing.login');
+})->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout']);
 
-// // Kegiatan
-// Route::resource('/kegiatan', KegiatanController::class);
+// Kegiatan
+Route::resource('/kegiatan', KegiatanController::class);
 
-// // Pencapaian
-// Route::get('/pencapaian', [PencapaianController::class, 'index'])->name('pencapaian.index');
-// Route::post('/pencapaian/reset', [PencapaianController::class, 'reset'])->name('pencapaian.reset');
-// Route::post('/pencapaian', [PencapaianController::class, 'store'])->name('pencapaian.store');
-// Route::post('/pencapaian/tambah', [PencapaianController::class, 'tambah'])->name('pencapaian.tambah');
-// Route::post('/pencapaian/kurang', [PencapaianController::class, 'kurang']);
-// Route::post('/pencapaian/tambah-kegiatan', [PencapaianController::class, 'tambahKegiatan']);
-// Route::post('/pencapaian/hapus', [PencapaianController::class, 'hapus']);
-// Route::get('/pencapaian/tambah-counter/{index}', [PencapaianController::class, 'formTambahCounter']);
-// Route::post('/pencapaian/tambah-counter/{index}', [PencapaianController::class, 'simpanTambahCounter']);
+// Pencapaian
+Route::get('/pencapaian', [PencapaianController::class, 'index'])->name('pencapaian.index');
+Route::post('/pencapaian/reset', [PencapaianController::class, 'reset'])->name('pencapaian.reset');
+Route::post('/pencapaian', [PencapaianController::class, 'store'])->name('pencapaian.store');
+Route::post('/pencapaian/tambah', [PencapaianController::class, 'tambah'])->name('pencapaian.tambah');
+Route::post('/pencapaian/kurang', [PencapaianController::class, 'kurang']);
+Route::post('/pencapaian/tambah-kegiatan', [PencapaianController::class, 'tambahKegiatan']);
+Route::post('/pencapaian/hapus', [PencapaianController::class, 'hapus']);
+Route::get('/pencapaian/tambah-counter/{index}', [PencapaianController::class, 'formTambahCounter']);
+Route::post('/pencapaian/tambah-counter/{index}', [PencapaianController::class, 'simpanTambahCounter']);
 
 
-// // Jadwal
-// Route::prefix('jadwal')->group(function () {
-//     Route::get('/', [JadwalController::class, 'index'])->name('jadwal.index'); 
-//     Route::get('/create', [JadwalController::class, 'create'])->name('jadwal.create');
-//     Route::post('/', [JadwalController::class, 'store'])->name('jadwal.store');
-//     Route::get('/{id}/edit', [JadwalController::class, 'edit'])->name('jadwal.edit');
-//     Route::put('/{id}', [JadwalController::class, 'update'])->name('jadwal.update');
-//     Route::delete('/{id}', [JadwalController::class, 'destroy'])->name('jadwal.destroy'); 
-// });
+// Jadwal
+Route::prefix('jadwal')->group(function () {
+    Route::get('/', [JadwalController::class, 'index'])->name('jadwal.index'); 
+    Route::get('/create', [JadwalController::class, 'create'])->name('jadwal.create');
+    Route::post('/', [JadwalController::class, 'store'])->name('jadwal.store');
+    Route::get('/{id}/edit', [JadwalController::class, 'edit'])->name('jadwal.edit');
+    Route::put('/{id}', [JadwalController::class, 'update'])->name('jadwal.update');
+    Route::delete('/{id}', [JadwalController::class, 'destroy'])->name('jadwal.destroy'); 
+});
 
-// // Register
-// Route::get('/buatakun', [RegisterController::class, 'showForm'])->name('buatakun');
-// Route::post('/register', [RegisterController::class, 'register'])->name('register');
+// Register
+Route::get('/buatakun', [RegisterController::class, 'showForm'])->name('buatakun');
+Route::post('/register', [RegisterController::class, 'register'])->name('register');
